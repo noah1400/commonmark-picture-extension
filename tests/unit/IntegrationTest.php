@@ -35,7 +35,9 @@ class IntegrationTest extends TestCase
             ["[[[\n+ img_1 {media: \"(min-width: 1000px) and (max-width: 2000px)\"}\n+ img_2 {media: \"(min-width: 2000px)\"}\n- img_3 {size: 1000px}\n]]]",
             '<picture><source media="(min-width: 1000px) and (max-width: 2000px)" srcset="img_1" /><source media="(min-width: 2000px)" srcset="img_2" /><img size="1000px" src="img_3" /></picture>'."\n"],
             ["[[[\n+ img_3 {sizes} \n+ img_3\n- img_3 \n]]]","<picture><source sizes=\"sizes\" srcset=\"img_3\" /><source srcset=\"img_3\" /><img src=\"img_3\" /></picture>\n"],
-            ["[[[\n+ flower.webp {type:image/webp}\n+ flower.jpg {type:image/jpeg}\n- flower.jpg {alt:\"\"}\n]]]",'<picture><source type="image/webp" srcset="flower.webp" /><source type="image/jpeg" srcset="flower.jpg" /><img alt="" src="flower.jpg" /></picture>'."\n"]
+            ["[[[\n+ flower.webp {type:image/webp}\n+ flower.jpg {type:image/jpeg}\n- flower.jpg {alt:\"\"}\n]]]",'<picture><source type="image/webp" srcset="flower.webp" /><source type="image/jpeg" srcset="flower.jpg" /><img alt="" src="flower.jpg" /></picture>'."\n"],
+            ["[[[\n+ img_1 {media:\"(min-width:650px)\"}\n+ img_2 {media:\"(min-width:465px)\"}\n- img_3\n]]]",
+            "<picture><source media=\"(min-width:650px)\" srcset=\"img_1\" /><source media=\"(min-width:465px)\" srcset=\"img_2\" /><img src=\"img_3\" /></picture>\n"]
         ];
     }
 }
