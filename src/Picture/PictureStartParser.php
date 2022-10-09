@@ -20,7 +20,6 @@ final class PictureStartParser implements BlockStartParserInterface
         ) {
             return BlockStart::none();
         }else{
-            echo "block start at " . $cursor->getPosition();
             return BlockStart::of(new PictureParser());
         }
     }

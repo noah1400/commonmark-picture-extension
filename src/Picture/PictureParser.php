@@ -44,28 +44,28 @@ final class PictureParser extends AbstractBlockContinueParser implements BlockCo
 
     public function parseInlines(InlineParserEngineInterface $inlineParser): void
     {
-        // foreach ($this->body as $element) {
-        //     $this->block->appendChild($element);
-        // }
     }
 
     private function getAttributes(string $attributes_str): array
     {
         $splitted = explode(',', $attributes_str);
+        // remove all quotes except that are escaped
+        $splitted = array_map(function ($item) {
+            return preg_replace('/(?<!\\\\)((?:\\\\\\\\)*)"/', '', $item);
+        }, $splitted);
         // attributes can be as a key:value pair or just a key
         $attributes = array_map(function ($item) {
 
-            $pair = explode(':', $item);
-            // remove all quotes except that are escaped
-            $pair = array_map(function ($item) {
-                return preg_replace('/(?<!\\\\)((?:\\\\\\\\)*)"/', '', $item);
-            }, $pair);
+            $pair = explode(':', $item, 2);
+            if (empty($pair[0])) $pair[0] = 'null';
             if (count($pair) === 2) {
-                return [$pair[0] => $pair[1]];
+                return [trim($pair[0]) => trim($pair[1])];
             } else {
-                return [$pair[0] => null];
+                return [trim($pair[0]) => trim($pair[0])];
             }
         }, $splitted);
+        // flatten the array to a single level
+        $attributes = array_reduce($attributes, 'array_merge', []);
         return $attributes;
     }
 
@@ -73,31 +73,41 @@ final class PictureParser extends AbstractBlockContinueParser implements BlockCo
     {
         if (!empty($line)) {
             // source regex
-            $re = "/\+\s*([a-zA-Z0-9_.]+)(?:\s*{(.*)})/s";
+            $re = "/\+\s*([a-zA-Z0-9_.]+)(?:\s*{(.*)}){0,1}/s";
             # group 1: filename
             # group 2: attributes
             $found = preg_match($re, $line, $matches, PREG_OFFSET_CAPTURE, 0);
             if ($found) {
                 $filename = $matches[1][0];
-                $attributes_str = $matches[2][0];
-
-
-                $attributes = $this->getAttributes($attributes_str);
-                $source = new PictureSource($filename, $attributes);
+                if (isset($matches[2][0]) && !empty($matches[2][0])) {
+                    $attributes = $this->getAttributes($matches[2][0]);
+                } else {
+                    $attributes = [];
+                }
+                if (!empty($filename)) {
+                    // add filename as srcset attribute to attributes
+                    $attributes['srcset'] = $filename;
+                }
+                $source = new PictureSource($attributes);
                 $this->block->appendChild($source);
             } else {
                 // image regex
-                $re = "/\-\s*([a-zA-Z0-9_.]+)(?:\s*{(.*)})/s";
+                $re = "/\-\s*([a-zA-Z0-9_.]+)(?:\s*{(.*)}){0,1}/s";
                 # group 1: filename
                 # group 2: attributes
                 $found = preg_match($re, $line, $matches, PREG_OFFSET_CAPTURE, 0);
                 if ($found) {
                     $filename = $matches[1][0];
-                    $attributes_str = $matches[2][0];
-
-                    $attributes = $this->getAttributes($attributes_str);
-
-                    $image = new PictureImage($filename, $attributes);
+                    if (isset($matches[2][0]) && !empty($matches[2][0])) {
+                        $attributes = $this->getAttributes($matches[2][0]);
+                    } else {
+                        $attributes = [];
+                    }
+                    if (!empty($filename)) {
+                        // add filename as src attribute to attributes
+                        $attributes['src'] = $filename;
+                    }
+                    $image = new PictureImage($attributes);
                     $this->block->appendChild($image);
                 }
             }

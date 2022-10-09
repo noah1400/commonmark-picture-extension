@@ -16,12 +16,7 @@ final class PictureSourceRenderer implements NodeRendererInterface, XmlNodeRende
     {
         PictureSource::assertInstanceOf($node);
         $attr = $node->data->get('attributes');
-        echo "\n";
-        echo "PictureSourceRenderer::render()\n";
-        echo "attr: ";
-        var_dump($attr[0]);
-        echo "\n";
-        return new HtmlElement('source', $attr);
+        return new HtmlElement('source', $attr, '', true);
     }
 
     public function getXmlTagName(Node $node): string

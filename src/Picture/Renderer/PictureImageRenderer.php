@@ -13,9 +13,8 @@ final class PictureImageRenderer implements NodeRendererInterface, XmlNodeRender
     public function render(Node $node, ChildNodeRendererInterface $childRenderer): \Stringable
     {
         PictureImage::assertInstanceOf($node);
-
         $attr = $node->data->get('attributes');
-        return new HtmlElement('img', $attr);
+        return new HtmlElement('img', $attr, '', true);
     }
 
     public function getXmlTagName(Node $node): string
