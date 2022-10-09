@@ -20,7 +20,7 @@ final class PictureStartParser implements BlockStartParserInterface
         ) {
             return BlockStart::none();
         }else{
-            return BlockStart::of(new PictureParser());
+            return BlockStart::of(new PictureParser);
         }
     }
 }
